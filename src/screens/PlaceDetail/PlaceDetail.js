@@ -1,20 +1,38 @@
-import React from "react";
+import React, { Component } from "react";
 import { Button, Image, StyleSheet, Text, View } from "react-native";
+import { connect } from "react-redux";
 
-const PlaceDetail = props => {
-  return (
-    <View style={styles.container}>
-      <View>
-        <Image style={styles.placeImage} source={props.selectedPlace.image} />
-        <Text style={styles.placeName}>{props.selectedPlace.placeName}</Text>
+import { deletePlace } from "../../store/actions/index";
+
+class PlaceDetail extends Component {
+  placeDeletedHandler = () => {
+    this.props.onDeletePlace(this.props.selectedPlace.key);
+    this.props.navigator.pop();
+  };
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View>
+          <Image
+            style={styles.placeImage}
+            source={this.props.selectedPlace.image}
+          />
+          <Text style={styles.placeName}>
+            {this.props.selectedPlace.placeName}
+          </Text>
+        </View>
+        <View>
+          <Button
+            title="Delete"
+            color="red"
+            onPress={this.placeDeletedHandler}
+          />
+        </View>
       </View>
-      <View>
-        <Button title="Delete" color="red" onPress={props.onItemDeleted} />
-        <Button title="Close" onPress={props.onModalClosed} />
-      </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -31,4 +49,13 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PlaceDetail;
+const mapDispatchToProps = dispatch => {
+  return {
+    onDeletePlace: key => dispatch(deletePlace(key))
+  };
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(PlaceDetail);
