@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import { Text, View } from "react-native";
+import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
 import { connect } from "react-redux";
 
 import PlaceInput from "../../components/PlaceInput/PlaceInput";
 import { addPlace } from "../../store/actions/index";
+import PickImage from "../../components/PickImage/PickImage";
+import PickLocation from "../../components/PickLocation/PickLocation";
 
 class SharePlaceScreen extends Component {
   constructor(props) {
@@ -25,12 +27,32 @@ class SharePlaceScreen extends Component {
 
   render() {
     return (
-      <View>
-        <PlaceInput onPlaceAdded={this.placeAddedHandler} />
-      </View>
+      <ScrollView>
+        <View style={styles.container}>
+          <Text>Share a place with us</Text>
+          <PickImage />
+          <PickLocation />
+          <PlaceInput />
+          <View style={styles.button}>
+            <Button title="Share the place" />
+          </View>
+        </View>
+      </ScrollView>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, alignItems: "center" },
+  placeholder: {
+    borderWidth: 1,
+    borderColor: "black",
+    backgroundColor: "#eee",
+    width: "80%",
+    height: 150
+  },
+  button: { margin: 8 }
+});
 
 const mapDispatchToProps = dispatch => {
   return {
