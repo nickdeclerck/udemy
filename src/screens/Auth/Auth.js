@@ -1,13 +1,71 @@
 import React, { Component } from "react";
-import { Text, View, Button, TextInput, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import startMainTabs from "../MainTabs/startMainTabs";
 import DefaultInput from "../../components/UI/DefaultInput/DefaultInput";
 import ButtonWithBackground from "../../components/UI/ButtonWithBackground/ButtonWithBackground";
+import validate from "../../utility/validation";
 
 class AuthScreen extends Component {
+  state = {
+    controls: {
+      email: { value: "", valid: false, validationRules: { isEmail: true } },
+      password: { value: "", valid: false, validationRules: { minLength: 6 } },
+      confirmPassword: {
+        value: "",
+        valid: false,
+        validationRules: { equalTo: "password" }
+      }
+    }
+  };
+
   loginHandler = () => {
     startMainTabs();
+  };
+
+  updateInputState = (key, value) => {
+    let connectedValue = {};
+    if (this.state.controls[key].validationRules.equalTo) {
+      const equalControl = this.state.controls[key].validationRules.equalTo;
+      const equalValue = this.state.controls[equalControl].value;
+      connectedValue = {
+        ...connectedValue,
+        equalTo: equalValue
+      };
+    }
+    if (key === "password") {
+      connectedValue = {
+        ...connectedValue,
+        equalTo: value
+      };
+    }
+    this.setState(prevState => {
+      return {
+        controls: {
+          confirmPassword: {
+            ...prevState.controls.confirmPassword,
+            valid:
+              key === "password"
+                ? validate(
+                    prevState.controls.confirmPassword.value,
+                    prevState.controls.confirmPassword.validationRules,
+                    connectedValue
+                  )
+                : prevState.controls.confirmPassword.valid
+          },
+          ...prevState.controls,
+          [key]: {
+            ...prevState.controls[key],
+            value: value,
+            valid: validate(
+              value,
+              prevState.controls[key].validationRules,
+              connectedValue
+            )
+          }
+        }
+      };
+    });
   };
 
   render() {
@@ -21,9 +79,20 @@ class AuthScreen extends Component {
           <DefaultInput
             style={styles.input}
             placeholder="Your e-mail address"
+            onChangeTextHandler={val => this.updateInputState("password", val)}
           />
-          <DefaultInput style={styles.input} placeholder="Password" />
-          <DefaultInput style={styles.input} placeholder="Confirm password" />
+          <DefaultInput
+            style={styles.input}
+            placeholder="Password"
+            onChangeTextHandler={val => this.updateInputState("password", val)}
+          />
+          <DefaultInput
+            style={styles.input}
+            placeholder="Confirm password"
+            onChangeTextHandler={val =>
+              this.updateInputState("confirmPassword", val)
+            }
+          />
         </View>
         <ButtonWithBackground color="#29aaf4" onPress={this.loginHandler}>
           Submit
